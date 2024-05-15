@@ -1,8 +1,8 @@
-const express = require("express");
-const morgan = require("morgan");
-const cors = require("cors");
+import express, { Request, Response, NextFunction } from "express";
+import morgan from "morgan";
+import cors from "cors";
 
-const contactsRouter = require("./routes/contactsRouter.js");
+import { contactsRouter } from "./routes/contactsRouter";
 
 const app = express();
 
@@ -16,7 +16,11 @@ app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-app.use((err, req, res, next) => {
+interface CustomError extends Error {
+  status?: number;
+}
+
+app.use((err: CustomError, req: Request, res: Response, next: NextFunction) => {
   const { status = 500, message = "Server error" } = err;
   res.status(status).json({ message });
 });
