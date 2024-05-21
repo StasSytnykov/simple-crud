@@ -1,8 +1,16 @@
 import { v4 } from "uuid";
 import fs from "fs/promises";
-import path from "node:path";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const contactsPath = path.join(__dirname, "db", "contacts.json");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const contactsPath = path.join(
+  __dirname.slice(0, __dirname.indexOf("services")),
+  "db",
+  "contacts.json",
+);
 
 interface Contact {
   id: string;
@@ -33,7 +41,7 @@ const addContact = async (name: string, email: string, phone: string) => {
   const contacts = await listContacts();
   const newContact = { id: v4(), name, email, phone };
   contacts.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts));
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, ' '));
   return newContact;
 };
 
@@ -66,8 +74,8 @@ const removeContact = async (contactId: string) => {
   }
 
   const removedContact = contacts.splice(index, 1);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts));
-  return removedContact;
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, ' '));
+  return removedContact[0];
 };
 
 export default {

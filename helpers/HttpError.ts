@@ -1,4 +1,4 @@
-const messageList = {
+const messageList: { [key: number]: string } = {
   400: "Bad Request",
   401: "Unauthorized",
   403: "Forbidden",

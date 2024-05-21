@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { controllersWrapper } from "../helpers/controllersWrapper";
-import contactsService from "../services/contactsServices";
+import { controllersWrapper } from "../helpers/controllersWrapper.ts";
+import { HttpError } from "../helpers/HttpError.ts";
+import contactsService from "../services/contactsServices.ts";
 
 const getAllContacts = async (
   req: Request,
@@ -11,9 +12,30 @@ const getAllContacts = async (
   res.json(result);
 };
 
-const getOneContact = (req: Request, res: Response, next: NextFunction) => {};
+const getOneContact = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const result = await contactsService.getContactById(req.params.id);
 
-const deleteContact = (req: Request, res: Response, next: NextFunction) => {};
+  if (!result) {
+    throw HttpError(404, `Contact with id ${req.params.id} not found`);
+  }
+
+  res.json(result);
+};
+
+const deleteContact = async (req: Request, res: Response, next: NextFunction) => {
+
+  const result = await contactsService.removeContact(req.params.id);
+
+  if (!result) {
+    throw HttpError(404, `Contact with id ${req.params.id} not found`);
+  }
+
+  res.json(result);
+};
 
 const createContact = (req: Request, res: Response, next: NextFunction) => {};
 
@@ -21,8 +43,8 @@ const updateContact = (req: Request, res: Response, next: NextFunction) => {};
 
 export default {
   getAllContacts: controllersWrapper(getAllContacts),
-  // getOneContact: controllersWrapper(getOneContact),
-  // deleteContact: controllersWrapper(deleteContact),
+  getOneContact: controllersWrapper(getOneContact),
+  deleteContact: controllersWrapper(deleteContact),
   // createContact: controllersWrapper(createContact),
   // updateContact: controllersWrapper(updateContact),
 };

@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import morgan from "morgan";
 import cors from "cors";
 
-import { contactsRouter } from "./routes/contactsRouter";
+import { contactsRouter } from "./routes/contactsRouter.ts";
 
 const app = express();
 
