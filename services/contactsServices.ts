@@ -41,26 +41,37 @@ const addContact = async (name: string, email: string, phone: string) => {
   const contacts = await listContacts();
   const newContact = { id: v4(), name, email, phone };
   contacts.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, ' '));
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, " "));
   return newContact;
 };
 
 const updateContact = async (
+  contactId: string,
   name: string,
   email: string,
   phone: string,
-  contactId: string,
 ) => {
   const contacts: Contact[] = await listContacts();
-  const [contactsToUpdate] = contacts.filter(
-    (contact: Contact) => contact.id === contactId,
-  );
+  let updatedContact = null;
+  const updatedContacts = contacts.map((contact: Contact) => {
+    if (contact.id === contactId) {
+      updatedContact = {
+        ...contact,
+        name: name ?? contact.name,
+        email: email ?? contact.email,
+        phone: phone ?? contact.phone,
+      };
+      return updatedContact;
+    }
+    return contact;
+  });
 
-  if (name) contactsToUpdate.name = name;
-  if (email) contactsToUpdate.email = email;
-  if (phone) contactsToUpdate.phone = phone;
+  if (!updatedContact) {
+    return null;
+  }
 
-  const updatedContacts = contactsToUpdate;
+  await fs.writeFile(contactsPath, JSON.stringify(updatedContacts, null, " "));
+  return updatedContact;
 };
 
 const removeContact = async (contactId: string) => {
@@ -74,7 +85,7 @@ const removeContact = async (contactId: string) => {
   }
 
   const removedContact = contacts.splice(index, 1);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, ' '));
+  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, " "));
   return removedContact[0];
 };
 
@@ -83,4 +94,5 @@ export default {
   getContactById,
   removeContact,
   addContact,
+  updateContact,
 };
